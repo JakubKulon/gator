@@ -29,18 +29,18 @@ function validateConfig(rawConfig: any): Config {
   }
 
   if (!("db_url" in parsedConfig)) {
-    throw new Error("not valid");
+    throw new Error("db not valid");
   }
 
   if ("db_url" in parsedConfig && typeof parsedConfig["db_url"] !== "string") {
-    throw new Error("not valid");
+    throw new Error("db not valid");
   }
 
   if (
     "current_user_name" in parsedConfig &&
     typeof parsedConfig["current_user_name"] !== "string"
   ) {
-    throw new Error("not valid");
+    throw new Error("user not valid");
   }
 
   return {
