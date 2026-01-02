@@ -1,6 +1,9 @@
+import { fetchFeed } from "src/lib/db/rss";
 import { readConfig, setUser } from "../config";
 import { resetUsers } from "../lib/db/queries/general";
 import { getUser, createUser, getUsers } from "../lib/db/queries/users";
+import { addFeed } from "src/lib/db/queries/feeds";
+import { printFeed } from "src/lib/helpers/printFeed";
 
 export async function handlerLogin(_cmdName: string, ...args: string[]) {
   if (args.length === 0) {
@@ -34,13 +37,11 @@ export async function handlerRegister(_cmdName: string, ...args: string[]) {
   setUser(response.name);
 
   console.log(`User ${response.name} has been created`);
-  console.log(response);
 }
 
 export async function handleReset(_cmdName: string, ...args: string[]) {
-  const res = await resetUsers();
+  await resetUsers();
 
-  console.log(res);
 
   console.log("All users has been reseted");
 }
@@ -57,4 +58,34 @@ export async function handleUsers() {
     return `* ${user.name}`;
   });
   console.log(users);
+}
+
+export async function handlerAgg(_cmdName: string) {
+
+  const response = await fetchFeed('https://www.wagslane.dev/index.xml');
+  console.log(JSON.stringify(response));
+}
+
+export async function handlerAddFeed(_cmdName: string, ...args: string[]) {
+  if (args.length < 2) {
+    throw new Error("the addfeed handler expects two arguments: the feed name and the feed url");
+  }
+
+  const feedName = args[0];
+  const feedUrl = args[1];
+
+  const currentUser = readConfig().currentUserName;
+
+  const user = await getUser(currentUser);
+  if (!user) {
+    throw new Error(`User ${currentUser} not found in the database.`);
+  }
+
+  const feedResponse = await addFeed({
+    name: feedName,
+    url: feedUrl,
+    userId: user.id,
+  });
+
+  printFeed(feedResponse, user);
 }
