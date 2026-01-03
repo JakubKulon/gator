@@ -2,7 +2,7 @@ import { fetchFeed } from "src/lib/db/rss";
 import { readConfig, setUser } from "../config";
 import { resetUsers } from "../lib/db/queries/general";
 import { getUser, createUser, getUsers } from "../lib/db/queries/users";
-import { addFeed } from "src/lib/db/queries/feeds";
+import { addFeed, createFeedFollow, getAllFeeds, getFeedByURL, getFeedFollowsForUser } from "src/lib/db/queries/feeds";
 import { printFeed } from "src/lib/helpers/printFeed";
 
 export async function handlerLogin(_cmdName: string, ...args: string[]) {
@@ -87,5 +87,74 @@ export async function handlerAddFeed(_cmdName: string, ...args: string[]) {
     userId: user.id,
   });
 
+  const feedFollowResponse = await createFeedFollow({
+    feedId: feedResponse.id,
+    userId: user.id,
+  })
+
+  console.log(feedFollowResponse.feedName, feedFollowResponse.userName);
+
+
   printFeed(feedResponse, user);
+}
+
+export async function handlerFeeds(_cmdName: string) {
+  const response = await getAllFeeds();
+
+  const users = await getUsers();
+
+  const userMap = new Map(users.map((user) => [user.id, user.name]));
+
+  for (const feed of response) {
+    console.log({
+      name: feed.name,
+      url: feed.url,
+      feedCreator: userMap.get(feed.userId),
+    });
+  }
+}
+
+export async function handlerFollowFeed(_cmdName: string, ...args: string[]) {
+  if (args.length < 1) {
+    throw new Error("the follow handler expects a single argument, the feed url");
+  }
+
+  const feedUrl = args[0];
+
+  const currentUser = readConfig().currentUserName;
+
+  const user = await getUser(currentUser);
+  if (!user) {
+    throw new Error(`User ${currentUser} not found in the database.`);
+  }
+
+  const feedResponse = await getFeedByURL(feedUrl);
+
+  if (!feedResponse) {
+    throw new Error(`Feed ${feedUrl} not found in the database.`);
+  }
+
+  const feedFollowResponse = await createFeedFollow({
+    feedId: feedResponse.id,
+    userId: user.id,
+  })
+
+  console.log({
+    feedName: feedFollowResponse.feedName,
+    feedCreator: feedFollowResponse.userName,
+  });
+
+}
+
+export async function handlerFollowing(_cmdName: string) {
+  const currentUserName = readConfig().currentUserName;
+  const user = await getUser(currentUserName);
+
+  if (!user) {
+    throw new Error(`User ${currentUserName} not found`);
+  }
+
+  const response = await getFeedFollowsForUser(user.id);
+
+  console.log(JSON.stringify(response));
 }
