@@ -2,8 +2,9 @@ import { fetchFeed } from "src/lib/db/rss";
 import { readConfig, setUser } from "../config";
 import { resetUsers } from "../lib/db/queries/general";
 import { getUser, createUser, getUsers } from "../lib/db/queries/users";
-import { addFeed, createFeedFollow, getAllFeeds, getFeedByURL, getFeedFollowsForUser } from "src/lib/db/queries/feeds";
+import { addFeed, createFeedFollow, deleteFeedFollow, getAllFeeds, getFeedByURL, getFeedFollowsForUser } from "src/lib/db/queries/feeds";
 import { printFeed } from "src/lib/helpers/printFeed";
+import { User } from "src/lib/db/schema";
 
 export async function handlerLogin(_cmdName: string, ...args: string[]) {
   if (args.length === 0) {
@@ -66,20 +67,13 @@ export async function handlerAgg(_cmdName: string) {
   console.log(JSON.stringify(response));
 }
 
-export async function handlerAddFeed(_cmdName: string, ...args: string[]) {
+export async function handlerAddFeed(_cmdName: string, user: User, ...args: string[]) {
   if (args.length < 2) {
     throw new Error("the addfeed handler expects two arguments: the feed name and the feed url");
   }
 
   const feedName = args[0];
   const feedUrl = args[1];
-
-  const currentUser = readConfig().currentUserName;
-
-  const user = await getUser(currentUser);
-  if (!user) {
-    throw new Error(`User ${currentUser} not found in the database.`);
-  }
 
   const feedResponse = await addFeed({
     name: feedName,
@@ -114,19 +108,12 @@ export async function handlerFeeds(_cmdName: string) {
   }
 }
 
-export async function handlerFollowFeed(_cmdName: string, ...args: string[]) {
+export async function handlerFollowFeed(_cmdName: string, user: User, ...args: string[]) {
   if (args.length < 1) {
     throw new Error("the follow handler expects a single argument, the feed url");
   }
 
   const feedUrl = args[0];
-
-  const currentUser = readConfig().currentUserName;
-
-  const user = await getUser(currentUser);
-  if (!user) {
-    throw new Error(`User ${currentUser} not found in the database.`);
-  }
 
   const feedResponse = await getFeedByURL(feedUrl);
 
@@ -146,15 +133,26 @@ export async function handlerFollowFeed(_cmdName: string, ...args: string[]) {
 
 }
 
-export async function handlerFollowing(_cmdName: string) {
-  const currentUserName = readConfig().currentUserName;
-  const user = await getUser(currentUserName);
-
-  if (!user) {
-    throw new Error(`User ${currentUserName} not found`);
-  }
+export async function handlerFollowing(_cmdName: string, user: User) {
 
   const response = await getFeedFollowsForUser(user.id);
 
   console.log(JSON.stringify(response));
+}
+
+export async function handlerUnfollowFeed(_cmdName: string, user: User, ...args: string[]) {
+  if (args.length < 1) {
+    throw new Error("the unfollow handler expects a single argument, the feed url");
+  }
+
+  const feedUrl = args[0];
+
+  const feedResponse = await getFeedByURL(feedUrl);
+
+  if (!feedResponse) {
+    throw new Error(`Feed ${feedUrl} not found in the database.`);
+  }
+
+  await deleteFeedFollow(feedResponse.id, user.id);
+
 }

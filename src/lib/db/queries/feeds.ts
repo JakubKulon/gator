@@ -1,7 +1,7 @@
 import { db } from "..";
 import { feedFollows, feeds, users } from "../schema";
 import { type Feed, type FeedFollow, type User } from "../schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getUser } from "./users";
 
 type InsertFeed = Omit<Feed, "id">;
@@ -48,6 +48,12 @@ export async function getFeedFollowsForUser(userId: string): Promise<{ feedName:
         feedName: feeds.name,
         userName: users.name,
     }).from(feedFollows).innerJoin(feeds, eq(feedFollows.feedId, feeds.id)).innerJoin(users, eq(feedFollows.userId, users.id)).where(eq(feedFollows.userId, userId));
+
+    return result;
+}
+
+export async function deleteFeedFollow(feedFollowId: string, userId: string): Promise<FeedFollow> {
+    const [result] = await db.delete(feedFollows).where(and(eq(feedFollows.feedId, feedFollowId), eq(feedFollows.userId, userId))).returning();
 
     return result;
 }
