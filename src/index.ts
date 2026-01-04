@@ -3,13 +3,13 @@ import {
   handlerRegister,
   handleReset,
   handleUsers,
-  handlerAgg,
+  handlerAggregate,
   handlerAddFeed,
   handlerFeeds,
   handlerFollowFeed,
   handlerFollowing,
   handlerUnfollowFeed,
-} from "./commands/commands";
+} from "./commands";
 import {
   CommandsRegistry,
   middlewareLoggedIn,
@@ -31,7 +31,7 @@ async function main() {
   registerCommand(commandRegistry, "register", handlerRegister);
   registerCommand(commandRegistry, "reset", handleReset);
   registerCommand(commandRegistry, "users", handleUsers);
-  registerCommand(commandRegistry, "agg", handlerAgg);
+  registerCommand(commandRegistry, "agg", handlerAggregate);
   registerCommand(commandRegistry, "addfeed", middlewareLoggedIn(handlerAddFeed));
   registerCommand(commandRegistry, "feeds", handlerFeeds);
   registerCommand(commandRegistry, "follow", middlewareLoggedIn(handlerFollowFeed));

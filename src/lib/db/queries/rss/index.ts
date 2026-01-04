@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { getFeedByURL, getNextFeedToFetch, markFeedFetched } from "../feeds";
 
 const xmlParser = new XMLParser();
 
@@ -61,4 +62,22 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
             item: validatedItems,
         },
     };
+}
+
+
+export async function scrapeFeed(): Promise<void> {
+
+    try {
+        const nextFeedToFetch = await getNextFeedToFetch()
+        await markFeedFetched(nextFeedToFetch.id)
+
+        const feedData = await fetchFeed(nextFeedToFetch.url)
+
+        for (const item of feedData.channel.item) {
+            console.log(item.title)
+        }
+
+    } catch (error) {
+        console.error(error)
+    }
 }
