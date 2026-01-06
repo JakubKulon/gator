@@ -1,7 +1,7 @@
 
 # Gator
 
-Gator is a CLI-based user management tool built with TypeScript, Node.js, and Postgres (via Drizzle ORM).
+Gator is a CLI-based RSS aggregator built with TypeScript, Node.js, and Postgres (via Drizzle ORM).
 
 ## Prerequisites
 
