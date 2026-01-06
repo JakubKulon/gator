@@ -9,6 +9,7 @@ import {
   handlerFollowFeed,
   handlerFollowing,
   handlerUnfollowFeed,
+  handlerBrowser,
 } from "./commands";
 import {
   CommandsRegistry,
@@ -37,6 +38,7 @@ async function main() {
   registerCommand(commandRegistry, "follow", middlewareLoggedIn(handlerFollowFeed));
   registerCommand(commandRegistry, "following", middlewareLoggedIn(handlerFollowing));
   registerCommand(commandRegistry, "unfollow", middlewareLoggedIn(handlerUnfollowFeed));
+  registerCommand(commandRegistry, "browser", middlewareLoggedIn(handlerBrowser));
 
   try {
     await runCommand(commandRegistry, args[0], ...args.slice(1));

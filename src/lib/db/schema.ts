@@ -49,7 +49,7 @@ export const posts = pgTable("posts", {
   title: text("title").notNull(),
   url: text("url").unique().notNull(),
   description: text("description"),
-  publishedAt: timestamp("published_at"),
+  publishedAt: timestamp("published_at").notNull(),
   feedId: uuid("feed_id")
     .notNull()
     .references(() => feeds.id, { onDelete: "cascade" }),
@@ -65,5 +65,5 @@ export type Post = typeof posts.$inferSelect;
 
 export type PostInsert = Omit<
   typeof posts.$inferInsert,
-  "id" | "createdAt" | "updatedAt" | "publishedAt"
+  "id" | "createdAt" | "updatedAt"
 >;

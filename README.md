@@ -60,7 +60,7 @@ Run the tool using `npm start` followed by the command and arguments.
 Registers a new user in the database and logs them in (updates `current_user_name` in config).
 
 ```bash
-npm start -- register <username>
+npm start register <username>
 ```
 
 #### Login
@@ -68,7 +68,7 @@ npm start -- register <username>
 Logs in as an existing user.
 
 ```bash
-npm start -- login <username>
+npm start login <username>
 ```
 
 #### List Users
@@ -76,7 +76,7 @@ npm start -- login <username>
 Lists all users in the database. The currently logged-in user is marked with `(current)`.
 
 ```bash
-npm start -- users
+npm start users
 ```
 
 #### Reset Users
@@ -84,7 +84,47 @@ npm start -- users
 Resets (deletes) all users from the database.
 
 ```bash
-npm start -- reset
+npm start reset
+```
+
+#### Add a Feed
+
+Follows a new RSS feed.
+
+```bash
+npm start follow <url>
+```
+
+#### List Followed Feeds
+
+Lists all feeds followed by the current user.
+
+```bash
+npm start following
+```
+
+#### Unfollow a Feed
+
+Unfollows an existing RSS feed.
+
+```bash
+npm start unfollow <url>
+```
+
+#### Browse Posts
+
+Displays the latest posts from your followed feeds. Optionally specify a limit (default is 2).
+
+```bash
+npm start browser [limit]
+```
+
+#### Run Aggregator
+
+Starts the RSS aggregator to fetch new posts from followed feeds at a specified interval (e.g., `5s` for 5 seconds).
+
+```bash
+npm start agg <interval>
 ```
 
 ## Tech Stack

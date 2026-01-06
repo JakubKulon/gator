@@ -1,5 +1,8 @@
 import { XMLParser } from "fast-xml-parser";
-import { getFeedByURL, getNextFeedToFetch, markFeedFetched } from "../feeds";
+import { getNextFeedToFetch, markFeedFetched } from "../feeds";
+import { createPost } from "../posts";
+import { parseRssDateOrNow } from "src/lib/helpers/parseRssDateOrNow";
+
 
 const xmlParser = new XMLParser();
 
@@ -74,7 +77,13 @@ export async function scrapeFeed(): Promise<void> {
         const feedData = await fetchFeed(nextFeedToFetch.url)
 
         for (const item of feedData.channel.item) {
-            console.log(item.title)
+            await createPost({
+                title: item.title,
+                url: item.link,
+                description: item.description,
+                publishedAt: parseRssDateOrNow(item.pubDate),
+                feedId: nextFeedToFetch.id,
+            })
         }
 
     } catch (error) {

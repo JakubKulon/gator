@@ -8,3 +8,5 @@ export { handlerFeeds } from "./feeds";
 export { handlerFollowFeed } from "./followFeed";
 export { handlerFollowing } from "./following";
 export { handlerUnfollowFeed } from "./unfollowFeed";
+export { handlerBrowser } from "./browser";
+
